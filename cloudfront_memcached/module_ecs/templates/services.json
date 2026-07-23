@@ -1,0 +1,26 @@
+[
+    {
+      "name": "${var.ecs_name}",
+      "image": "${var.image_ecr_url}":"${var.image_tag}",
+      "cpu": ${var.container_cpu},
+      "memory": ${fargate_memory},
+      "essential": true,
+      "environment": ["${var.task_environment_variables}"],
+      "secrets": ["${var.task_secret_environment_variables}"],
+      "networkMode": "awsvpc",
+      "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "${var.ecs_name}LogGroup",
+            "awslogs-region": "${var.current_region}",
+            "awslogs-stream-prefix" : "${var.ecs_name}"
+          }
+      },
+      "portMappings": [
+        {
+          "containerPort": ${app_port},
+          "hostPort": ${app_port}
+        }
+      ]
+    }
+  ]
