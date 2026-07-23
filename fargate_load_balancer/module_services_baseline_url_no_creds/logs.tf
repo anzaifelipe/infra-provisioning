@@ -1,0 +1,40 @@
+/*#######======================================================================================================
+------------------Creating Cloudwatch logs for ECS
+======================================================================================================#######*/
+# Cloudwatch to store logs
+resource "aws_cloudwatch_log_group" "CloudWatchLogGroup" {
+  name = "/ecs/${var.service_name}-LogGroup"
+  retention_in_days = var.retention_in_days
+  tags = merge(
+    {
+      "Name" = format(
+        "${var.prefix_name}-${var.service_name}-cluster"
+      )
+    },
+    var.tags,
+  )
+}
+
+resource "aws_cloudwatch_log_stream" "CloudWatchLogStream" {
+  name           = "${var.service_name}-LogStream"
+  log_group_name = aws_cloudwatch_log_group.CloudWatchLogGroup.name
+}
+
+
+resource "aws_cloudwatch_log_group" "CloudWatchLogGroup2" {
+  name = "/ecs/${var.service_name_second}-LogGroup"
+  retention_in_days = var.retention_in_days
+  tags = merge(
+    {
+      "Name" = format(
+        "${var.prefix_name}-${var.service_name}-cluster"
+      )
+    },
+    var.tags,
+  )
+}
+
+resource "aws_cloudwatch_log_stream" "CloudWatchLogStream2" {
+  name           = "${var.service_name_second}-LogStream"
+  log_group_name = aws_cloudwatch_log_group.CloudWatchLogGroup.name
+}
