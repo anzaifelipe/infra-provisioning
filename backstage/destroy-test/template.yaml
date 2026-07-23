@@ -1,0 +1,84 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-test-destroy
+  title: Create a Test to destroy resources
+  description: Deploy a complete environment for automated tests.
+  tags: ['qa', 'automated', 'test', 'environment']
+  links:
+    - title: Repositório
+      url: https://github.com/agilecontent/devops-utils
+      icon: github
+spec:
+  owner: user:agile-automation
+  type: infra-as-code
+
+  parameters:
+    - title: Environment Variables
+      required:
+        - Project
+        - environment
+      properties:
+        Project:
+          title: Project Name
+          type: string
+          description: Name of the project you are working on or the name of the project you want to deploy.
+
+        environment:
+          title: The environment the resource is part of
+          type: string
+          description: Which environment your application will be created in is usually related to the AWS account you will be provisioning your resource to.
+
+  steps:
+    - id: fetch-base
+      name: Fetching Details from content folder
+      action: fetch:template
+      input:
+        targetPath: ./outputs/terraform
+        url: ./SKELETON
+        values:
+          project: ${{ parameters.Project }}
+          environment: ${{ parameters.environment }}
+
+    - id: show_workspace
+      name: Show workspace files
+      action: debug:log
+      input:
+        listWorkspace: true
+
+    - id: terraform_pr
+      name: Create terraform PR
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=agilecontent&repo=consolidation-devops-modules
+        branchName: 'qa-auto/mib/${{ parameters.environment }}-autos-${{ parameters.Project }}'
+        title: '🔩 Create ${{ parameters.environment }}-autos-${{ parameters.Project }} AWS EC2'
+        description: |
+          ## Creating Environment ${{ parameters.environment }}-autos-${{ parameters.Project }}
+
+          This is an initial pull request to create a QA Autos environment and was created based on the Backstage template.
+
+          *created by: [Backstage Software Template] 👷‍♂️⚙️👷‍♀️
+        sourcePath: ./outputs/terraform
+        targetPath: 'backstage/qa-auto/launched/${{ parameters.environment }}-autos-${{ parameters.Project }}'
+
+    - id: label_pr
+      name: Add labels to PR
+      action: github:issues:label
+      input:
+        repoUrl: github.com?owner=agilecontent&repo=consolidation-devops-modules
+        number: '${{ steps.terraform_pr.output.pullRequestNumber }}'
+        labels:
+          - terraform
+          - created-by-backstage
+          - ${{ parameters.environment }}
+          - qa-autos
+
+  output:
+    links:
+      - title: Veja seu Pull Request :D
+        icon: github
+        url: ${{ steps.terraform_pr.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

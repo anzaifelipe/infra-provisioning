@@ -1,0 +1,23 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: qa
+  description: The main group in the organization
+spec:
+  type: team
+  profile:
+    displayName: QA
+    email: qa@org.com
+  parent: org
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: anzaifelipe
+  description: admin
+spec:
+  profile:
+    displayName: anzaifelipe
+    email: 
+  memberOf: [qa]

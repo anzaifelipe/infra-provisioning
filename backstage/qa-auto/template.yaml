@@ -1,0 +1,376 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-qa-auto-env
+  title: Create a QA Auto Environment
+  description: Deploy a complete environment for automated tests.
+  tags: ['qa', 'automated', 'test', 'environment']
+  links:
+    - title: Repositório
+      url: https://github.com/agilecontent/devops-utils
+      icon: github
+spec:
+  owner: user:agile-automation
+  type: infra-as-code
+
+  parameters:
+    - title: Environment Variables
+      required:
+        - Project
+        - environment
+        - serverVersion
+        - instanceType
+        - agentVersion
+        - releaseVersion
+        - replicasAgent
+        - fidesiredCount
+        - fidesiredMin
+        - fidesiredMax
+        - apidesiredCount
+        - apidesiredMin
+        - apidesiredMax
+        - authdesiredCount
+        - authdesiredMin
+        - authdesiredMax
+        - frontenddesiredCount
+        - frontenddesiredMin
+        - frontenddesiredMax
+        - concurrencydesiredCount
+        - concurrencydesiredMin
+        - concurrencydesiredMax
+        - edithistorydesiredCount
+        - edithistorydesiredMin
+        - edithistorydesiredMax
+        - mailerdesiredCount
+        - mailerdesiredMin
+        - mailerdesiredMax
+        - mongodesiredCount
+        - mongodesiredMin
+        - mongodesiredMax
+        - permissionsdesiredCount
+        - permissionsdesiredMin
+        - permissionsdesiredMax
+        - tsvdesiredCount
+        - tsvdesiredMin
+        - tsvdesiredMax
+        - reactdesiredCount
+        - reactdesiredMin
+        - reactdesiredMax
+        - reactversion
+        - rdsinstance
+      properties:
+        instanceType:
+          title: EC2 Instance Type
+          type: string
+          description: t3.large (2 vCPU / 8GB RAM), t3.xlarge (4 vCPU / 16GB RAM), t3.2xlarge (8 vCPU / 32GB RAM), c5.4xlarge (16 vCPU / 32GB RAM)
+          enum:
+            - t3.large
+            - t3.xlarge
+            - t3.2xlarge
+            - c5.4xlarge
+          ui:autofocus: true
+
+        rdsinstance:
+          title: RDS Instance Type
+          type: string
+          description: db.t3.small (2 vCPU / 2GB RAM), db.t3.medium (2 vCPU / 4GB RAM), db.t3.large (2 vCPU / 8GB RAM), db.t3.xlarge (4 vCPU / 16GB RAM), db.t3.2xlarge (8 vCPU / 32GB RAM), db.c5.4xlarge (16 vCPU / 32GB RAM)
+          enum:
+            - db.t3.small
+            - db.t3.medium
+            - db.t3.large
+            - db.t3.xlarge
+            - db.t3.2xlarge
+            - db.c5.4xlarge
+
+        Project:
+          title: Project Name
+          type: string
+          description: Name of the project you are working on or the name of the project you want to deploy.
+
+        environment:
+          title: The environment the resource is part of
+          type: string
+          description: Which environment your application will be created in is usually related to the AWS account you will be provisioning your resource to.
+
+        serverVersion:
+          title: Set a QA image version
+          type: string
+          description: Set the EC2 tag version.
+
+        agentVersion:
+          title: Set a QA agent version
+          type: string
+          description: Set the EC2 tag version.
+
+        releaseVersion:
+          title: Release MIB Version
+          type: string
+          description: The version of the release.
+        
+        reactversion:
+          title: Frontend React Version
+          type: string
+          description: The version of the Frontend react.
+
+        replicasAgent:
+          title: Number Replicas QA Agent
+          type: number
+          description: The number of replicas of the agent.
+
+        fidesiredCount:
+          title: ECS Filemanagement Desired Count
+          type: number
+          description: The number of filemanagement desired containers.
+
+        fidesiredMin:
+          title: ECS Filemanagement Desired Min
+          type: number
+          description: The minimum number of filemanagement desired containers.
+
+        fidesiredMax:
+          title: ECS Filemanagement Desired Max
+          type: number
+          description: The maximum number of filemanagement desired containers.
+
+        apidesiredCount:
+          title: ECS Api Desired Count
+          type: number
+          description: The number of api desired containers.
+
+        apidesiredMin:
+          title: ECS Api Desired Min
+          type: number
+          description: The minimum number of api desired containers.
+
+        apidesiredMax:
+          title: ECS Api Desired Max
+          type: number
+          description: The maximum number of api desired containers.
+
+        authdesiredCount:
+          title: ECS Auth Desired Count
+          type: number
+          description: The number of auth desired containers.
+
+        authdesiredMin:
+          title: ECS Auth Desired Min
+          type: number
+          description: The minimum number of auth desired containers.
+
+        authdesiredMax:
+          title: ECS Auth Desired Max
+          type: number
+          description: The maximum number of auth desired containers.
+
+        frontenddesiredCount:
+          title: ECS Frontend Desired Count
+          type: number
+          description: The number of frontend desired containers.
+
+        frontenddesiredMin:
+          title: ECS Frontend Desired Min
+          type: number
+          description: The minimum number of frontend desired containers.
+
+        frontenddesiredMax:
+          title: ECS Frontend Desired Max
+          type: number
+          description: The maximum number of frontend desired containers.
+        
+        reactdesiredCount:
+          title: ECS React Desired Count
+          type: number
+          description: The number of react desired containers.
+
+        reactdesiredMin:
+          title: ECS React Desired Min
+          type: number
+          description: The minimum number of react desired containers.
+        
+        reactdesiredMax:
+          title: ECS React Desired Max
+          type: number
+          description: The maximum number of react desired containers.
+
+        concurrencydesiredCount:
+          title: ECS Concurrency Desired Count
+          type: number
+          description: The number of concurrency desired containers.
+
+        concurrencydesiredMin:
+          title: ECS Concurrency Desired Min
+          type: number
+          description: The minimum number of concurrency desired containers.
+
+        concurrencydesiredMax:
+          title: ECS Concurrency Desired Max
+          type: number
+          description: The maximum number of concurrency desired containers.
+
+        edithistorydesiredCount:
+          title: ECS Edithistory Desired Count
+          type: number
+          description: The number of edithistory desired containers.
+
+        edithistorydesiredMin:
+          title: ECS Edithistory Desired Min
+          type: number
+          description: The minimum number of edithistory desired containers.
+
+        edithistorydesiredMax:
+          title: ECS Edithistory Desired Max
+          type: number
+          description: The maximum number of edithistory desired containers.
+
+        mailerdesiredCount:
+          title: ECS Mailer Desired Count
+          type: number
+          description: The number of mailer desired containers.
+
+        mailerdesiredMin:
+          title: ECS Mailer Desired Min
+          type: number
+          description: The minimum number of mailer desired containers.
+
+        mailerdesiredMax:
+          title: ECS Mailer Desired Max
+          type: number
+          description: The maximum number of mailer desired containers.
+
+        mongodesiredCount:
+          title: ECS Mongo Desired Count
+          type: number
+          description: The number of mongo desired containers.
+
+        mongodesiredMin:
+          title: ECS Mongo Desired Min
+          type: number
+          description: The minimum number of mongo desired containers.
+
+        mongodesiredMax:
+          title: ECS Mongo Desired Max
+          type: number
+          description: The maximum number of mongo desired containers.
+
+        permissionsdesiredCount:
+          title: ECS Permission Desired Count
+          type: number
+          description: The number of permissions desired containers.
+
+        permissionsdesiredMin:
+          title: ECS Permission Desired Min
+          type: number
+          description: The minimum number of permissions desired containers.
+
+        permissionsdesiredMax:
+          title: ECS Permission Desired Max
+          type: number
+          description: The maximum number of permissions desired containers.
+
+        tsvdesiredCount:
+          title: ECS TSV Desired Count
+          type: number
+          description: The number of tsv desired containers.
+
+        tsvdesiredMin:
+          title: ECS TSV Desired Min
+          type: number
+          description: The minimum number of tsv desired containers.
+
+        tsvdesiredMax:
+          title: ECS TSV Desired Max
+          type: number
+          description: The maximum number of tsv desired containers.  
+  steps:
+    - id: fetch-base
+      name: Fetching Details from content folder
+      action: fetch:template
+      input:
+        targetPath: ./outputs/terraform
+        url: ./SKELETON
+        values:
+          project: ${{ parameters.Project }}
+          environment: ${{ parameters.environment }}
+          serverversion: ${{ parameters.serverVersion }}
+          instancetype: ${{ parameters.instanceType }}
+          agentversion: ${{ parameters.agentVersion }}
+          releaseversion: ${{ parameters.releaseVersion }}
+          replicasagent: ${{ parameters.replicasAgent }}
+          fidesiredcount: ${{ parameters.fidesiredCount }}
+          fidesiredmin: ${{ parameters.fidesiredMin }}
+          fidesiredmax: ${{ parameters.fidesiredMax }}
+          apidesiredcount: ${{ parameters.apidesiredCount }}
+          apidesiredmin: ${{ parameters.apidesiredMin }}
+          apidesiredmax: ${{ parameters.apidesiredMax }}
+          authdesiredcount: ${{ parameters.authdesiredCount }}
+          authdesiredmin: ${{ parameters.authdesiredMin }}
+          authdesiredmax: ${{ parameters.authdesiredMax }}
+          frontenddesiredcount: ${{ parameters.frontenddesiredCount }}
+          frontenddesiredmin: ${{ parameters.frontenddesiredMin }}
+          frontenddesiredmax: ${{ parameters.frontenddesiredMax }}
+          reactdesiredcount: ${{ parameters.reactdesiredCount }}
+          reactdesiredmin: ${{ parameters.reactdesiredMin }}
+          reactdesiredmax: ${{ parameters.reactdesiredMax }}
+          concurrencydesiredcount: ${{ parameters.concurrencydesiredCount }}
+          concurrencydesiredmin: ${{ parameters.concurrencydesiredMin }}
+          concurrencydesiredmax: ${{ parameters.concurrencydesiredMax }}
+          edithistorydesiredcount: ${{ parameters.edithistorydesiredCount }}
+          edithistorydesiredmin: ${{ parameters.edithistorydesiredMin }}
+          edithistorydesiredmax: ${{ parameters.edithistorydesiredMax }}
+          mailerdesiredcount: ${{ parameters.mailerdesiredCount }}
+          mailerdesiredmin: ${{ parameters.mailerdesiredMin }}
+          mailerdesiredmax: ${{ parameters.mailerdesiredMax }}
+          mongodesiredcount: ${{ parameters.mongodesiredCount }}
+          mongodesiredmin: ${{ parameters.mongodesiredMin }}
+          mongodesiredmax: ${{ parameters.mongodesiredMax }}
+          permissionsdesiredcount: ${{ parameters.permissionsdesiredCount }}
+          permissionsdesiredmin: ${{ parameters.permissionsdesiredMin }}
+          permissionsdesiredmax: ${{ parameters.permissionsdesiredMax }}
+          tsvdesiredcount: ${{ parameters.tsvdesiredCount }}
+          tsvdesiredmin: ${{ parameters.tsvdesiredMin }}
+          tsvdesiredmax: ${{ parameters.tsvdesiredMax }}
+          reactversion: ${{ parameters.reactversion }}
+          rdsinstance: ${{ parameters.rdsinstance }}
+
+    - id: show_workspace
+      name: Show workspace files
+      action: debug:log
+      input:
+        listWorkspace: true
+
+    - id: terraform_pr
+      name: Create terraform PR
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=agilecontent&repo=consolidation-devops-modules
+        branchName: 'qa-auto/mib/${{ parameters.environment }}-autos-${{ parameters.Project }}'
+        title: '🔩 Create ${{ parameters.environment }}-autos-${{ parameters.Project }} AWS EC2'
+        description: |
+          ## Creating Environment ${{ parameters.environment }}-autos-${{ parameters.Project }}
+
+          This is an initial pull request to create a QA Autos environment and was created based on the Backstage template.
+
+          *created by: [Backstage Software Template] 👷‍♂️⚙️👷‍♀️
+        sourcePath: ./outputs/terraform
+        targetPath: 'backstage/qa-auto/launched/${{ parameters.environment }}-autos-${{ parameters.Project }}'
+
+    - id: label_pr
+      name: Add labels to PR
+      action: github:issues:label
+      input:
+        repoUrl: github.com?owner=agilecontent&repo=consolidation-devops-modules
+        number: '${{ steps.terraform_pr.output.pullRequestNumber }}'
+        labels:
+          - terraform
+          - created-by-backstage
+          - ${{ parameters.environment }}
+          - qa-autos
+
+  output:
+    links:
+      - title: Veja seu Pull Request :D
+        icon: github
+        url: ${{ steps.terraform_pr.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

@@ -1,0 +1,23 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: org
+  description: The org organization
+  links:
+    - url: https://org.com/
+      title: Website
+spec:
+  type: organization
+  profile:
+    displayName: 
+    email: noreply@org.com
+  children: [qa]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: groups
+  description: Group backstage users
+spec:
+  targets:
+    - ./qa-group.yaml

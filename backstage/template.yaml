@@ -1,0 +1,157 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-ec2-teamcity
+  title: Create an EC2 with TeamCity
+  description: Deploy a 2024 TeamCity in docker-compose using MS SQL Server Express.
+  tags: ['ec2', 'teamcity', 'docker-compose', 'mssql']
+  links:
+    - title: Repositório
+      url: https://github.com/agilecontent/devops-utils
+      icon: github
+spec:
+  owner: user:agile-automation
+  type: infra-as-code
+
+  parameters:
+    - title: TeamCity details
+      required:
+        - InstanceType
+        - Project
+        - environment
+        - KeyPair
+        - VolumeSize
+        - SubnetId
+        - SQLServerPassword
+        - Domain
+        - ZoneId
+        - VPCId
+      properties:
+        InstanceType:
+          title: EC2 Instance Type
+          type: string
+          description: Select the type of EC2 instance you want to deploy.
+          enum:
+            - t3.large
+            - t3.medium
+            - t3.small
+            - t3.micro
+          ui:autofocus: true
+
+        Project:
+          title: Project Name
+          type: string
+          description: Name of the project you are working on or the name of the project you want to deploy.
+
+        environment:
+          title: The environment the resource is part of
+          type: string
+          description: Which environment your application will be created in is usually related to the AWS account you will be provisioning your resource to.
+          default: prod
+          enum: [prod, staging, dev]
+
+        KeyPair:
+          title: Key Pair Name
+          type: string
+          description: The name of the key pair to use for the instance.
+
+        VolumeSize:
+          title: Volume Size
+          type: number
+          description: The size of the volume in GB.
+        
+        SubnetId:
+          title: Subnet ID
+          type: string
+          description: The ID of the subnet to launch the instance into.
+        
+        SQLServerPassword:
+          title: SQL Server Password
+          type: string
+          description: The password for the SQL Server.
+
+        Domain:
+          title: Domain
+          type: string
+          description: The domain name for the instance.
+
+        ZoneId:
+          title: Zone ID
+          type: string
+          description: The ID of the zone to launch the instance into.
+        
+        VPCId:
+          title: VPC ID
+          type: string
+          description: The ID of the VPC to launch the instance into.
+
+  steps:
+    - id: fetch-base
+      name: Fetching Details from content folder
+      action: fetch:template
+      input:
+        targetPath: ./outputs/terraform
+        url: ./skeleton/resources
+        values:
+          instancetype: ${{ parameters.InstanceType }}
+          project: ${{ parameters.Project }}
+          environment: ${{ parameters.environment }}
+          keypair: ${{ parameters.KeyPair }}
+          volumesize: ${{ parameters.VolumeSize }}
+          subnetid: ${{ parameters.SubnetId }}
+          sqlserverpassword: ${{ parameters.SQLServerPassword }}
+          domain: ${{ parameters.Domain }}
+          zoneid: ${{ parameters.ZoneId }}
+          vpcid: ${{ parameters.VPCId }}
+
+    - id: show_workspace
+      name: Show workspace files
+      action: debug:log
+      input:
+        listWorkspace: true
+
+    - id: terraform_pr
+      name: Create terraform PR
+      action: publish:github:pull-request
+      input:
+        repoUrl: github.com?owner=agilecontent&repo=fast-devops-modules
+        branchName: 'sw-template/TC/${{ parameters.environment }}-backstage-TC-${{ parameters.Project }}'
+        title: '🔩 Create ${{ parameters.environment }}-backstage-TC-${{ parameters.Project }} AWS EC2'
+        description: |
+          ## Creating EC2 ${{ parameters.environment }}-backstage-TC-${{ parameters.Project }}
+
+          This is an initial pull request to create an EC2 TeamCity instance and was created based on the Backstage template.
+
+          If you need to add more parameters, check the official documentation - https://registry.terraform.io/modules/terraform-aws-modules/ec2/aws/latest
+
+          *created by: [Backstage Software Template](https://hextech-portal.gdantas.com.br/create)* 👷‍♂️⚙️👷‍♀️
+        sourcePath: ./outputs/terraform
+        targetPath: 'backstage/skeleton/resources/${{ parameters.environment }}-backstage-TC-${{ parameters.Project }}'
+
+    - id: label_pr
+      name: Add labels to PR
+      action: github:issues:label
+      input:
+        repoUrl: github.com?owner=agilecontent&repo=fast-devops-modules
+        number: '${{ steps.terraform_pr.output.pullRequestNumber }}'
+        labels:
+          - terraform
+          - created-by-backstage
+          - ${{ parameters.environment }}
+          - ec2-teamcity
+
+    - id: register
+      name: Registering the new Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.remoteUrl }}
+        catalogInfoUrl: 'https://github.com/agilecontent/fast-devops-modules/tree/main/backstage/catalog-info.yaml'
+
+  output:
+    links:
+      - title: Veja seu Pull Request :D
+        icon: github
+        url: ${{ steps.terraform_pr.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
